@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { CampaignShell } from "../../components/customer/CampaignShell";
 import { useCampaign } from "../../context/CampaignContext";
 import { celebrate } from "../../lib/confetti";
@@ -7,7 +7,6 @@ import { rewardEmoji, rewardLabel } from "../../lib/wheel";
 
 export default function ResultPage() {
   const { status } = useCampaign();
-  const [copied, setCopied] = useState(false);
   const fired = useRef(false);
 
   useEffect(() => {
@@ -15,17 +14,6 @@ export default function ResultPage() {
     fired.current = true;
     if (status.reward !== "better_luck") celebrate(2500);
   }, []);
-
-  const copy = async () => {
-    if (!status.claim_id) return;
-    try {
-      await navigator.clipboard.writeText(status.claim_id);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      /* clipboard unavailable: the ID is still on screen */
-    }
-  };
 
   const noPrize = status.reward === "better_luck";
   const spunAt = status.spun_at
@@ -61,20 +49,7 @@ export default function ResultPage() {
             <dt className="text-white/60">Winner</dt>
             <dd className="font-semibold">{status.full_name}</dd>
           </div>
-          <div className="flex items-center justify-between gap-4">
-            <dd className="flex items-center gap-2">
-              <span className="rounded-lg bg-white px-3 py-1 font-mono text-base font-bold tracking-wider text-ink-900">
-                {status.claim_id}
-              </span>
-              <button
-                type="button"
-                onClick={() => void copy()}
-                className="rounded-lg bg-white/15 px-2.5 py-1.5 text-xs font-semibold"
-              >
-                {copied ? "Copied ✓" : "Copy"}
-              </button>
-            </dd>
-          </div>
+
           {spunAt && (
             <div className="flex justify-between gap-4">
               <dt className="text-white/60">Won on</dt>
