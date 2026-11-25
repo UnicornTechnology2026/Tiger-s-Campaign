@@ -1,12 +1,20 @@
-import { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { CheckCircle2, Clock, RefreshCw, ShieldCheck, Trophy, Users } from 'lucide-react';
-import { StatCard } from '../../components/admin/StatCard';
-import { RewardCharts } from '../../components/admin/RewardCharts';
-import { Spinner } from '../../components/common/Spinner';
-import { fetchDashboard } from '../../services/adminService';
-import { toMessage } from '../../lib/errors';
-import type { DashboardStats } from '../../types';
+import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  CheckCircle2,
+  Clock,
+  RefreshCw,
+  ShieldCheck,
+  Trophy,
+  Users,
+} from "lucide-react";
+import { StatCard } from "../../components/admin/StatCard";
+import { RewardCharts } from "../../components/admin/RewardCharts";
+import { Spinner } from "../../components/common/Spinner";
+import { fetchDashboard } from "../../services/adminService";
+import { toMessage } from "../../lib/errors";
+import type { DashboardStats } from "../../types";
+import { rewardLabel } from "../../lib/wheel";
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -36,13 +44,22 @@ export default function DashboardPage() {
           <h1 className="font-display text-2xl font-extrabold">Dashboard</h1>
           <p className="text-sm text-slate-500">Live campaign overview</p>
         </div>
-        <button type="button" className="admin-btn" onClick={() => void load()} disabled={loading}>
-          {loading ? <Spinner className="h-4 w-4" /> : <RefreshCw size={16} />} Refresh
+        <button
+          type="button"
+          className="admin-btn"
+          onClick={() => void load()}
+          disabled={loading}
+        >
+          {loading ? <Spinner className="h-4 w-4" /> : <RefreshCw size={16} />}{" "}
+          Refresh
         </button>
       </div>
 
       {error && (
-        <div role="alert" className="rounded-lg bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+        <div
+          role="alert"
+          className="rounded-lg bg-red-50 px-4 py-3 text-sm font-medium text-red-700"
+        >
           {error}
         </div>
       )}
@@ -56,7 +73,12 @@ export default function DashboardPage() {
       {stats && (
         <>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <StatCard label="Total registrations" value={stats.total_registrations} icon={Users} accent="bg-sky-100 text-sky-600" />
+            <StatCard
+              label="Total registrations"
+              value={stats.total_registrations}
+              icon={Users}
+              accent="bg-sky-100 text-sky-600"
+            />
             <StatCard
               label="OTP verified"
               value={stats.verified_customers}
@@ -64,7 +86,12 @@ export default function DashboardPage() {
               icon={ShieldCheck}
               accent="bg-violet-100 text-violet-600"
             />
-            <StatCard label="Total spins" value={stats.total_spins} icon={Trophy} accent="bg-amber-100 text-amber-600" />
+            <StatCard
+              label="Total spins"
+              value={stats.total_spins}
+              icon={Trophy}
+              accent="bg-amber-100 text-amber-600"
+            />
             <StatCard
               label="Redeemed"
               value={stats.redeemed}
@@ -78,8 +105,13 @@ export default function DashboardPage() {
 
           <section className="rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
             <div className="flex items-center justify-between px-5 py-4">
-              <h2 className="font-display text-base font-bold">Recent winners</h2>
-              <Link to="/admin/records" className="text-sm font-semibold text-brand-600 hover:underline">
+              <h2 className="font-display text-base font-bold">
+                Recent winners
+              </h2>
+              <Link
+                to="/admin/records"
+                className="text-sm font-semibold text-brand-600 hover:underline"
+              >
                 View all →
               </Link>
             </div>
@@ -98,8 +130,12 @@ export default function DashboardPage() {
                 <tbody className="divide-y divide-slate-100">
                   {stats.recent_winners.length === 0 && (
                     <tr>
-                      <td colSpan={6} className="px-5 py-10 text-center text-slate-400">
-                        <Clock className="mx-auto mb-2" size={20} /> No winners yet
+                      <td
+                        colSpan={6}
+                        className="px-5 py-10 text-center text-slate-400"
+                      >
+                        <Clock className="mx-auto mb-2" size={20} /> No winners
+                        yet
                       </td>
                     </tr>
                   )}
@@ -107,18 +143,26 @@ export default function DashboardPage() {
                     <tr key={w.claim_id}>
                       <td className="px-5 py-3 font-medium">{w.full_name}</td>
                       <td className="px-5 py-3 tabular-nums">{w.mobile}</td>
-                      <td className="px-5 py-3 font-semibold">{w.reward_ml} ML</td>
-                      <td className="px-5 py-3 font-mono text-xs">{w.claim_id}</td>
-                      <td className="px-5 py-3 text-slate-500">{new Date(w.spun_at).toLocaleString('en-IN')}</td>
+                      <td className="px-5 py-3 font-semibold">
+                        {rewardLabel(w.reward)}
+                      </td>
+                      <td className="px-5 py-3 font-mono text-xs">
+                        {w.claim_id}
+                      </td>
+                      <td className="px-5 py-3 text-slate-500">
+                        {new Date(w.spun_at).toLocaleString("en-IN")}
+                      </td>
                       <td className="px-5 py-3">
                         <span
                           className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                            w.redemption_status === 'redeemed'
-                              ? 'bg-emerald-100 text-emerald-700'
-                              : 'bg-amber-100 text-amber-700'
+                            w.redemption_status === "redeemed"
+                              ? "bg-emerald-100 text-emerald-700"
+                              : "bg-amber-100 text-amber-700"
                           }`}
                         >
-                          {w.redemption_status === 'redeemed' ? 'Redeemed' : 'Pending'}
+                          {w.redemption_status === "redeemed"
+                            ? "Redeemed"
+                            : "Pending"}
                         </span>
                       </td>
                     </tr>

@@ -1,11 +1,13 @@
-export type CustomerStage = 'unregistered' | 'registered' | 'verified' | 'spun';
-export type RedemptionStatus = 'pending' | 'redeemed';
+import type { RewardKey } from "../lib/wheel";
+
+export type CustomerStage = "unregistered" | "registered" | "verified" | "spun";
+export type RedemptionStatus = "pending" | "redeemed";
 
 export interface MyStatus {
   status: CustomerStage;
   full_name: string | null;
   mobile: string | null;
-  reward_ml: number | null;
+  reward: RewardKey | null;
   claim_id: string | null;
   spun_at: string | null;
 }
@@ -16,7 +18,7 @@ export interface OtpResult {
 }
 
 export interface SpinResult {
-  reward_ml: number;
+  reward: RewardKey;
   claim_id: string;
   customer_name: string;
   spun_at: string;
@@ -24,14 +26,14 @@ export interface SpinResult {
 }
 
 export interface DistributionItem {
-  reward_ml: number;
+  reward: RewardKey;
   count: number;
 }
 
 export interface RecentWinner {
   full_name: string;
   mobile: string;
-  reward_ml: number;
+  reward: RewardKey;
   claim_id: string;
   spun_at: string;
   redemption_status: RedemptionStatus;
@@ -54,7 +56,7 @@ export interface RecordRow {
   registered_at: string;
   otp_verified: boolean;
   spin_id: string | null;
-  reward_ml: number | null;
+  reward: RewardKey | null;
   claim_id: string | null;
   spun_at: string | null;
   redemption_status: RedemptionStatus | null;
@@ -66,6 +68,6 @@ export interface RecordFilters {
   search: string;
   dateFrom: string; // yyyy-mm-dd
   dateTo: string; // yyyy-mm-dd
-  reward: string; // '' or reward ml
-  redemption: '' | RedemptionStatus;
+  reward: "" | RewardKey;
+  redemption: "" | RedemptionStatus;
 }

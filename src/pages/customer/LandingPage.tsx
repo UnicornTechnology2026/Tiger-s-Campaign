@@ -1,13 +1,21 @@
-import { useNavigate } from 'react-router-dom';
-import { CampaignShell } from '../../components/customer/CampaignShell';
-import { routeForStage, useCampaign } from '../../context/CampaignContext';
-import { config } from '../../lib/config';
+import { useNavigate } from "react-router-dom";
+import { CampaignShell } from "../../components/customer/CampaignShell";
+import { routeForStage, useCampaign } from "../../context/CampaignContext";
+import { config } from "../../lib/config";
 
 const STEPS = [
-  { icon: '📝', title: 'Register', text: 'Enter your name and mobile number' },
-  { icon: '🔐', title: 'Verify', text: 'Confirm your number with an OTP' },
-  { icon: '🎡', title: 'Spin once', text: 'Spin the wheel and win up to 45 ML' },
-  { icon: '🏪', title: 'Redeem', text: `Show your claim ID to the staff at ${config.outletName}` },
+  { icon: "📝", title: "Register", text: "Enter your name and mobile number" },
+  { icon: "🔐", title: "Verify", text: "Confirm your number with an OTP" },
+  {
+    icon: "🎡",
+    title: "Spin once",
+    text: "Spin the wheel and win a Cap, Keychain, Coaster or Snacks",
+  },
+  {
+    icon: "🏪",
+    title: "Redeem",
+    text: `Show your claim ID to the staff at ${config.outletName}`,
+  },
 ];
 
 export default function LandingPage() {
@@ -15,13 +23,18 @@ export default function LandingPage() {
   const { status, loading } = useCampaign();
 
   const label =
-    status.status === 'spun'
-      ? 'View my reward'
-      : status.status === 'unregistered'
-        ? 'Start Now'
-        : 'Continue';
+    status.status === "spun"
+      ? "View my reward"
+      : status.status === "unregistered"
+        ? "Start Now"
+        : "Continue";
 
-  const go = () => navigate(status.status === 'unregistered' ? '/register' : routeForStage(status.status));
+  const go = () =>
+    navigate(
+      status.status === "unregistered"
+        ? "/register"
+        : routeForStage(status.status),
+    );
 
   return (
     <CampaignShell>
@@ -30,13 +43,14 @@ export default function LandingPage() {
           ✨ Scan · Spin · Win
         </div>
         <h1 className="font-display text-4xl font-extrabold leading-tight sm:text-5xl">
-          Spin the wheel &amp; win{' '}
+          Spin the wheel &amp; win{" "}
           <span className="bg-gradient-to-r from-amber-300 via-orange-400 to-brand-400 bg-clip-text text-transparent">
-            free ML!
+            exciting rewards!
           </span>
         </h1>
         <p className="mx-auto mt-3 max-w-xs text-base text-white/80">
-          Every customer gets one spin. 10, 20, 30, 40 or a jackpot 45&nbsp;ML — it&apos;s waiting for you.
+          Every customer gets one spin. Win a Cap, Keychain, Coaster or Snacks
+          worth ₹10 — it's waiting for you.
         </p>
       </div>
 
@@ -61,10 +75,17 @@ export default function LandingPage() {
         </ol>
       </div>
 
-      <button type="button" className="btn-primary mt-6" onClick={go} disabled={loading}>
-        {loading ? 'Loading…' : `${label} →`}
+      <button
+        type="button"
+        className="btn-primary mt-6"
+        onClick={go}
+        disabled={loading}
+      >
+        {loading ? "Loading…" : `${label} →`}
       </button>
-      <p className="mt-3 text-center text-xs text-white/50">Free to play · Valid at the outlet only</p>
+      <p className="mt-3 text-center text-xs text-white/50">
+        Free to play · Valid at the outlet only
+      </p>
     </CampaignShell>
   );
 }

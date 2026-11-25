@@ -3,19 +3,60 @@
  * the top (12 o'clock), where the pointer sits. The order below is the order
  * the rewards appear on the wheel.
  */
-export const WHEEL_SEGMENTS = [
-  { reward: 45, fill: '#FF2E63', text: '#FFFFFF' },
-  { reward: 10, fill: '#FFC400', text: '#3A2400' },
-  { reward: 20, fill: '#00C896', text: '#FFFFFF' },
-  { reward: 40, fill: '#2F6BFF', text: '#FFFFFF' },
-  { reward: 30, fill: '#9B30FF', text: '#FFFFFF' },
-] as const;
+export type RewardKey =
+  | "cap"
+  | "keychain"
+  | "coaster"
+  | "snacks"
+  | "better_luck";
+
+export const REWARD_INFO: Record<
+  RewardKey,
+  { label: string; emoji: string; lines: [string] | [string, string] }
+> = {
+  cap: { label: "Cap", emoji: "🧢", lines: ["CAP"] },
+  keychain: { label: "Keychain", emoji: "🔑", lines: ["KEYCHAIN"] },
+  coaster: { label: "Coaster", emoji: "🥃", lines: ["COASTER"] },
+  snacks: { label: "Snacks worth ₹10", emoji: "🍿", lines: ["SNACKS", "₹10"] },
+  better_luck: {
+    label: "Better Luck Next Time",
+    emoji: "🍀",
+    lines: ["BETTER LUCK", "NEXT TIME"],
+  },
+};
+
+export const REWARD_KEYS = Object.keys(REWARD_INFO) as RewardKey[];
+
+export function rewardLabel(reward: string | null | undefined): string {
+  return reward && reward in REWARD_INFO
+    ? REWARD_INFO[reward as RewardKey].label
+    : "";
+}
+
+export function rewardEmoji(reward: string | null | undefined): string {
+  return reward && reward in REWARD_INFO
+    ? REWARD_INFO[reward as RewardKey].emoji
+    : "🎁";
+}
+
+/** 1st Cap, 2nd Keychain, 3rd Coaster, 4th Snacks ₹10, 5th Better Luck Next Time. */
+export const WHEEL_SEGMENTS: ReadonlyArray<{
+  reward: RewardKey;
+  fill: string;
+  text: string;
+}> = [
+  { reward: "cap", fill: "#FF2E63", text: "#FFFFFF" },
+  { reward: "keychain", fill: "#FFC400", text: "#3A2400" },
+  { reward: "coaster", fill: "#00C896", text: "#FFFFFF" },
+  { reward: "snacks", fill: "#2F6BFF", text: "#FFFFFF" },
+  { reward: "better_luck", fill: "#64748B", text: "#FFFFFF" },
+];
 
 export const SEGMENT_ANGLE = 360 / WHEEL_SEGMENTS.length; // 72
 export const SPIN_DURATION_MS = 6000;
 
-export function rewardColor(reward: number): string {
-  return WHEEL_SEGMENTS.find((s) => s.reward === reward)?.fill ?? '#888888';
+export function rewardColor(reward: string): string {
+  return WHEEL_SEGMENTS.find((s) => s.reward === reward)?.fill ?? "#888888";
 }
 
 export function polar(cx: number, cy: number, r: number, deg: number) {
@@ -23,7 +64,12 @@ export function polar(cx: number, cy: number, r: number, deg: number) {
   return { x: cx + r * Math.sin(rad), y: cy - r * Math.cos(rad) };
 }
 
-export function segmentPath(index: number, r: number, cx = 200, cy = 200): string {
+export function segmentPath(
+  index: number,
+  r: number,
+  cx = 200,
+  cy = 200,
+): string {
   const a0 = index * SEGMENT_ANGLE;
   const a1 = (index + 1) * SEGMENT_ANGLE;
   const s = polar(cx, cy, r, a0);
@@ -37,7 +83,10 @@ export function segmentPath(index: number, r: number, cx = 200, cy = 200): strin
  * looking natural but always stays well inside the segment (±26° of ±36°).
  * The reward itself comes from the server; this only animates to it.
  */
-export function computeTargetRotation(currentRotation: number, reward: number): number {
+export function computeTargetRotation(
+  currentRotation: number,
+  reward: RewardKey,
+): number {
   const index = WHEEL_SEGMENTS.findIndex((s) => s.reward === reward);
   if (index < 0) throw new Error(`Unknown reward ${reward}`);
   const center = index * SEGMENT_ANGLE + SEGMENT_ANGLE / 2;
