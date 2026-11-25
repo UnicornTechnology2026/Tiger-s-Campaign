@@ -59,20 +59,11 @@ export default function ResultPage() {
         </dl>
       </div>
 
-      {noPrize ? (
+      {noPrize && (
         <div className="mt-5 rounded-2xl bg-white/10 p-4 text-center">
           <p className="font-display font-bold">Better luck next time!</p>
           <p className="mt-1 text-sm text-white/80">
             Visit {config.outletName} again for more offers.
-          </p>
-        </div>
-      ) : (
-        <div className="mt-5 rounded-2xl bg-amber-300 p-4 text-center text-ink-900">
-          <p className="font-display font-bold">Redeem your reward</p>
-          <p className="mt-1 text-sm">
-            Please contact the staff at {config.outletName} and show this screen
-            with your claim ID to redeem your {rewardLabel(status.reward)}. Take
-            a screenshot to keep it safe.
           </p>
         </div>
       )}

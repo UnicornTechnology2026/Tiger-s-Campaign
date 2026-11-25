@@ -1,18 +1,22 @@
-import { useRef, useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { CampaignShell } from '../../components/customer/CampaignShell';
-import { Spinner } from '../../components/common/Spinner';
-import { useCampaign } from '../../context/CampaignContext';
-import { registerCustomer } from '../../services/campaignService';
-import { normalizeMobileInput, validateMobile, validateName } from '../../lib/validation';
-import { toMessage } from '../../lib/errors';
+import { useRef, useState, type FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
+import { CampaignShell } from "../../components/customer/CampaignShell";
+import { Spinner } from "../../components/common/Spinner";
+import { useCampaign } from "../../context/CampaignContext";
+import { registerCustomer } from "../../services/campaignService";
+import {
+  normalizeMobileInput,
+  validateMobile,
+  validateName,
+} from "../../lib/validation";
+import { toMessage } from "../../lib/errors";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
   const { status, refresh } = useCampaign();
 
-  const [name, setName] = useState(status.full_name ?? '');
-  const [mobile, setMobile] = useState(status.mobile ?? '');
+  const [name, setName] = useState(status.full_name ?? "");
+  const [mobile, setMobile] = useState(status.mobile ?? "");
   const [touched, setTouched] = useState({ name: false, mobile: false });
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -30,9 +34,9 @@ export default function RegisterPage() {
     inFlight.current = true;
     setSubmitting(true);
     try {
-      await registerCustomer(name.trim().replace(/\s+/g, ' '), mobile);
+      await registerCustomer(name.trim().replace(/\s+/g, " "), mobile);
       await refresh();
-      navigate('/verify');
+      navigate("/verify");
     } catch (err) {
       setServerError(toMessage(err));
     } finally {
@@ -43,10 +47,11 @@ export default function RegisterPage() {
 
   return (
     <CampaignShell>
-      <form onSubmit={onSubmit} noValidate className="glass-card space-y-5">
+      <form onSubmit={onSubmit} noValidate className="space-y-5">
         <div className="text-center">
-          <h1 className="font-display text-2xl font-extrabold">Let&apos;s get you registered</h1>
-          <p className="mt-1 text-sm text-white/70">We&apos;ll verify your mobile number in the next step.</p>
+          <h1 className="font-display text-2xl font-extrabold">
+            Get ready to spin!
+          </h1>
         </div>
 
         <div>
@@ -65,11 +70,18 @@ export default function RegisterPage() {
             onBlur={() => setTouched((t) => ({ ...t, name: true }))}
             aria-invalid={touched.name && !!nameError}
           />
-          {touched.name && nameError && <p className="mt-1.5 text-sm font-medium text-red-300">{nameError}</p>}
+          {touched.name && nameError && (
+            <p className="mt-1.5 text-sm font-medium text-red-300">
+              {nameError}
+            </p>
+          )}
         </div>
 
         <div>
-          <label htmlFor="mobile" className="mb-1.5 block text-sm font-semibold">
+          <label
+            htmlFor="mobile"
+            className="mb-1.5 block text-sm font-semibold"
+          >
             Mobile number
           </label>
           <div className="flex overflow-hidden rounded-xl border border-white/30 bg-white/95 focus-within:border-amber-400 focus-within:ring-4 focus-within:ring-amber-400/40">
@@ -90,12 +102,17 @@ export default function RegisterPage() {
             />
           </div>
           {touched.mobile && mobileError && (
-            <p className="mt-1.5 text-sm font-medium text-red-300">{mobileError}</p>
+            <p className="mt-1.5 text-sm font-medium text-red-300">
+              {mobileError}
+            </p>
           )}
         </div>
 
         {serverError && (
-          <div role="alert" className="rounded-xl bg-red-500/20 px-4 py-3 text-sm font-medium text-red-100">
+          <div
+            role="alert"
+            className="rounded-xl bg-red-500/20 px-4 py-3 text-sm font-medium text-red-100"
+          >
             {serverError}
           </div>
         )}
@@ -106,7 +123,7 @@ export default function RegisterPage() {
               <Spinner /> Sending OTP…
             </>
           ) : (
-            'Send OTP →'
+            "Send OTP →"
           )}
         </button>
       </form>

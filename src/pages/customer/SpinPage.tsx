@@ -46,8 +46,8 @@ export default function SpinPage() {
 
   return (
     <CampaignShell>
-      <div className="text-center">
-        <p className="text-sm text-white/70">
+      <div className="text-center -mt-2">
+        <p className="text-2xl mb-2">
           Hi {status.full_name?.split(" ")[0] ?? "there"} 👋
         </p>
         <h1 className="font-display text-3xl font-extrabold">
