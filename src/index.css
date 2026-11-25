@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  @apply font-sans text-slate-900 antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-4 font-display text-lg font-bold text-ink-900 shadow-lg transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60;
+    background-image: linear-gradient(90deg, #ffc400, #ff8a00, #ffc400);
+    background-size: 200% 100%;
+  }
+  .btn-primary:not(:disabled):hover {
+    animation: shimmer 2s linear infinite;
+  }
+  .glass-card {
+    @apply rounded-3xl border border-white/20 bg-white/10 p-6 text-white shadow-card backdrop-blur-xl;
+  }
+  .field-input {
+    @apply w-full rounded-xl border border-white/30 bg-white/95 px-4 py-3.5 text-base text-slate-900 placeholder-slate-400 outline-none transition focus:border-amber-400 focus:ring-4 focus:ring-amber-400/40;
+  }
+  .admin-input {
+    @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20;
+  }
+  .admin-btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-ink-800 px-4 py-2 text-sm font-semibold text-white transition hover:bg-ink-700 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float,
+  .animate-bulb,
+  .animate-shimmer {
+    animation: none !important;
+  }
+}
