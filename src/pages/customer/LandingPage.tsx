@@ -49,8 +49,8 @@ export default function LandingPage() {
           </span>
         </h1>
         <p className="mx-auto mt-3 max-w-xs text-base text-white/80">
-          Every customer gets one spin. Win a Cap, Keychain, Coaster or Snacks
-          worth ₹10 — it's waiting for you.
+          Every customer gets one spin every day. Win a Cap, Keychain, Coaster
+          or Snacks worth ₹10 — it's waiting for you.
         </p>
       </div>
 

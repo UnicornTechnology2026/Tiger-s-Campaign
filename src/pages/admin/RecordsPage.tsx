@@ -243,7 +243,10 @@ export default function RecordsPage() {
                 </tr>
               )}
               {rows.map((r) => (
-                <tr key={r.customer_id} className="hover:bg-slate-50">
+                <tr
+                  key={r.spin_id ?? r.customer_id}
+                  className="hover:bg-slate-50"
+                >
                   <td className="px-4 py-3 font-medium">{r.full_name}</td>
                   <td className="px-4 py-3 tabular-nums">{r.mobile}</td>
                   <td className="px-4 py-3 text-slate-500">

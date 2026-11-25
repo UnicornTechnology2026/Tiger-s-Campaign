@@ -38,11 +38,11 @@ export default function SpinPage() {
   }, []);
 
   const onFinished = useCallback(async () => {
-    celebrate();
+    if (target !== "better_luck") celebrate();
     await sleep(1600);
     await refresh();
     navigate("/result", { replace: true });
-  }, [navigate, refresh]);
+  }, [navigate, refresh, target]);
 
   return (
     <CampaignShell>
@@ -73,7 +73,7 @@ export default function SpinPage() {
         </div>
       )}
       <p className="mt-2 text-center text-sm text-white/60">
-        You get one spin only — make it count!
+        One spin per day — make it count!
       </p>
     </CampaignShell>
   );

@@ -78,7 +78,7 @@ export default function ResultPage() {
       )}
 
       <p className="mt-4 text-center text-xs text-white/60">
-        Your spin has been used. Each mobile number can spin only once.
+        Today's spin has been used. Come back tomorrow for another spin!
       </p>
     </CampaignShell>
   );
