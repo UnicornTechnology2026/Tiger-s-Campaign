@@ -1,17 +1,17 @@
 import { useCallback, useEffect, useState } from "react";
-import { Download, Search, X } from "lucide-react";
+import { Download, Search, Trash2, X } from "lucide-react";
 import { Pagination } from "../../components/admin/Pagination";
 import { Spinner } from "../../components/common/Spinner";
 import { useDebounce } from "../../hooks/useDebounce";
 import {
+  deleteCustomers,
   fetchAllRecords,
   fetchRecords,
-  setRedemption,
 } from "../../services/adminService";
 import { downloadCsv, recordsToCsv } from "../../lib/csv";
 import { toMessage } from "../../lib/errors";
 import { rewardLabel, REWARD_KEYS } from "../../lib/wheel";
-import type { RecordFilters, RecordRow, RedemptionStatus } from "../../types";
+import type { RecordFilters, RecordRow } from "../../types";
 
 const EMPTY_FILTERS: RecordFilters = {
   search: "",
@@ -32,8 +32,12 @@ export default function RecordsPage() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [savingId, setSavingId] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
+
+  // selection + delete confirmation
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const effective: RecordFilters = { ...filters, search: debouncedSearch };
 
@@ -48,6 +52,7 @@ export default function RecordsPage() {
       }
       setRows(res.rows);
       setTotal(res.total);
+      setSelected(new Set()); // clear selection whenever the list reloads
     } catch (e) {
       setError(toMessage(e));
     } finally {
@@ -73,20 +78,6 @@ export default function RecordsPage() {
     setPage(1);
   };
 
-  const onStatusChange = async (row: RecordRow, status: RedemptionStatus) => {
-    if (!row.spin_id || status === row.redemption_status) return;
-    setSavingId(row.spin_id);
-    setError(null);
-    try {
-      await setRedemption(row.spin_id, status);
-      await load();
-    } catch (e) {
-      setError(toMessage(e));
-    } finally {
-      setSavingId(null);
-    }
-  };
-
   const exportCsv = async () => {
     setExporting(true);
     setError(null);
@@ -98,6 +89,41 @@ export default function RecordsPage() {
       setError(toMessage(e));
     } finally {
       setExporting(false);
+    }
+  };
+
+  // ---- selection helpers ----
+  const allSelected =
+    rows.length > 0 && rows.every((r) => selected.has(r.customer_id));
+  const someSelected = selected.size > 0 && !allSelected;
+
+  const toggleOne = (id: string) =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+
+  const toggleAll = () =>
+    setSelected(
+      allSelected ? new Set() : new Set(rows.map((r) => r.customer_id)),
+    );
+
+  const selectedRows = rows.filter((r) => selected.has(r.customer_id));
+
+  const confirmDelete = async () => {
+    setDeleting(true);
+    setError(null);
+    try {
+      await deleteCustomers(selectedRows.map((r) => r.customer_id));
+      setConfirmOpen(false);
+      await load();
+    } catch (e) {
+      setConfirmOpen(false);
+      setError(toMessage(e));
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -114,15 +140,30 @@ export default function RecordsPage() {
             Search, filter and manage reward redemption
           </p>
         </div>
-        <button
-          type="button"
-          className="admin-btn"
-          onClick={() => void exportCsv()}
-          disabled={exporting}
-        >
-          {exporting ? <Spinner className="h-4 w-4" /> : <Download size={16} />}{" "}
-          Export CSV
-        </button>
+        <div className="flex items-center gap-2">
+          {selected.size > 0 && (
+            <button
+              type="button"
+              className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700"
+              onClick={() => setConfirmOpen(true)}
+            >
+              <Trash2 size={16} /> Delete ({selected.size})
+            </button>
+          )}
+          <button
+            type="button"
+            className="admin-btn"
+            onClick={() => void exportCsv()}
+            disabled={exporting}
+          >
+            {exporting ? (
+              <Spinner className="h-4 w-4" />
+            ) : (
+              <Download size={16} />
+            )}{" "}
+            Export CSV
+          </button>
+        </div>
       </div>
 
       {/* filters */}
@@ -136,9 +177,7 @@ export default function RecordsPage() {
             className="admin-input !pl-9"
             placeholder="Search name or mobile…"
             value={filters.search}
-            onChange={(e) =>
-              update({ reward: e.target.value as RecordFilters["reward"] })
-            }
+            onChange={(e) => update({ search: e.target.value })}
             aria-label="Search by name or mobile"
           />
         </div>
@@ -219,94 +258,86 @@ export default function RecordsPage() {
           />
         )}
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[960px] text-left text-sm">
+          <table className="w-full min-w-[700px] text-left text-sm">
             <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
               <tr>
+                <th className="w-10 px-4 py-3">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 cursor-pointer rounded border-slate-300 accent-red-600"
+                    checked={allSelected}
+                    ref={(el) => {
+                      if (el) el.indeterminate = someSelected;
+                    }}
+                    onChange={toggleAll}
+                    disabled={rows.length === 0}
+                    aria-label="Select all rows on this page"
+                  />
+                </th>
                 <th className="px-4 py-3">Customer</th>
                 <th className="px-4 py-3">Mobile</th>
                 <th className="px-4 py-3">Registered</th>
                 <th className="px-4 py-3">OTP</th>
                 <th className="px-4 py-3">Reward</th>
-                <th className="px-4 py-3">Claim ID</th>
-                <th className="px-4 py-3">Redemption</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {!loading && rows.length === 0 && (
                 <tr>
                   <td
-                    colSpan={7}
+                    colSpan={6}
                     className="px-4 py-14 text-center text-slate-400"
                   >
                     No records found
                   </td>
                 </tr>
               )}
-              {rows.map((r) => (
-                <tr
-                  key={r.spin_id ?? r.customer_id}
-                  className="hover:bg-slate-50"
-                >
-                  <td className="px-4 py-3 font-medium">{r.full_name}</td>
-                  <td className="px-4 py-3 tabular-nums">{r.mobile}</td>
-                  <td className="px-4 py-3 text-slate-500">
-                    {new Date(r.registered_at).toLocaleString("en-IN")}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                        r.otp_verified
-                          ? "bg-emerald-100 text-emerald-700"
-                          : "bg-slate-100 text-slate-600"
-                      }`}
-                    >
-                      {r.otp_verified ? "Verified" : "Not verified"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 font-semibold">
-                    {r.reward ? (
-                      rewardLabel(r.reward)
-                    ) : (
-                      <span className="font-normal text-slate-400">
-                        Not spun
+              {rows.map((r) => {
+                const isSelected = selected.has(r.customer_id);
+                return (
+                  <tr
+                    key={r.spin_id ?? r.customer_id}
+                    className={
+                      isSelected ? "bg-red-50/60" : "hover:bg-slate-50"
+                    }
+                  >
+                    <td className="px-4 py-3">
+                      <input
+                        type="checkbox"
+                        className="h-4 w-4 cursor-pointer rounded border-slate-300 accent-red-600"
+                        checked={isSelected}
+                        onChange={() => toggleOne(r.customer_id)}
+                        aria-label={`Select ${r.full_name}`}
+                      />
+                    </td>
+                    <td className="px-4 py-3 font-medium">{r.full_name}</td>
+                    <td className="px-4 py-3 tabular-nums">{r.mobile}</td>
+                    <td className="px-4 py-3 text-slate-500">
+                      {new Date(r.registered_at).toLocaleString("en-IN")}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                          r.otp_verified
+                            ? "bg-emerald-100 text-emerald-700"
+                            : "bg-slate-100 text-slate-600"
+                        }`}
+                      >
+                        {r.otp_verified ? "Verified" : "Not verified"}
                       </span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 font-mono text-xs">
-                    {r.claim_id ?? "—"}
-                  </td>
-                  <td className="px-4 py-3">
-                    {r.spin_id && r.redemption_status ? (
-                      <div className="flex items-center gap-2">
-                        <select
-                          className={`rounded-lg border px-2 py-1 text-xs font-semibold outline-none ${
-                            r.redemption_status === "redeemed"
-                              ? "border-emerald-300 bg-emerald-50 text-emerald-700"
-                              : "border-amber-300 bg-amber-50 text-amber-700"
-                          }`}
-                          value={r.redemption_status}
-                          disabled={savingId === r.spin_id}
-                          onChange={(e) =>
-                            void onStatusChange(
-                              r,
-                              e.target.value as RedemptionStatus,
-                            )
-                          }
-                          aria-label={`Redemption status for ${r.full_name}`}
-                        >
-                          <option value="pending">Pending</option>
-                          <option value="redeemed">Redeemed</option>
-                        </select>
-                        {savingId === r.spin_id && (
-                          <Spinner className="h-4 w-4 text-slate-400" />
-                        )}
-                      </div>
-                    ) : (
-                      <span className="text-slate-400">—</span>
-                    )}
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="px-4 py-3 font-semibold">
+                      {r.reward ? (
+                        rewardLabel(r.reward)
+                      ) : (
+                        <span className="font-normal text-slate-400">
+                          Not spin
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -321,6 +352,65 @@ export default function RecordsPage() {
           }}
         />
       </div>
+
+      {/* delete confirmation dialog */}
+      {confirmOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4"
+          onClick={() => !deleting && setConfirmOpen(false)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-title"
+            className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start gap-3">
+              <div className="rounded-full bg-red-100 p-2 text-red-600">
+                <Trash2 size={20} />
+              </div>
+              <div className="min-w-0">
+                <h2 id="delete-title" className="text-lg font-bold">
+                  Delete {selectedRows.length}{" "}
+                  {selectedRows.length === 1 ? "customer" : "customers"}?
+                </h2>
+                <p className="mt-1 text-sm text-slate-600">
+                  This permanently removes the customer
+                  {selectedRows.length === 1 ? "" : "s"} and their spin result
+                  from the database. This cannot be undone.
+                </p>
+                <ul className="mt-3 max-h-32 space-y-1 overflow-y-auto rounded-lg bg-slate-50 p-3 text-sm">
+                  {selectedRows.map((r) => (
+                    <li key={r.customer_id} className="truncate">
+                      <span className="font-medium">{r.full_name}</span>{" "}
+                      <span className="text-slate-500">· {r.mobile}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end gap-2">
+              <button
+                type="button"
+                className="rounded-xl px-4 py-2 text-sm font-semibold text-slate-700 ring-1 ring-slate-300 hover:bg-slate-50"
+                onClick={() => setConfirmOpen(false)}
+                disabled={deleting}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-60"
+                onClick={() => void confirmDelete()}
+                disabled={deleting}
+              >
+                {deleting && <Spinner className="h-4 w-4" />} Yes, delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -62,7 +62,7 @@ export default function SpinPage() {
           Hi {status.full_name?.split(" ")[0] ?? "there"} 👋
         </p>
         <h1 className="font-display text-3xl font-extrabold">
-          {target === null ? "Tap SPIN to win!" : "Good luck… 🤞"}
+          {target === null ? "Spin Your Luck!" : "Good luck… 🤞"}
         </h1>
       </div>
 

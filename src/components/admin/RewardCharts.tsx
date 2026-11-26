@@ -14,9 +14,16 @@ import {
 import { rewardColor, rewardLabel } from "../../lib/wheel";
 import type { DistributionItem } from "../../types";
 
+// Short names for the x-axis only (full names are still used in tooltip / pie)
+const SHORT_LABEL: Record<string, string> = {
+  snacks: "Snacks ₹10",
+  better_luck: "Better Luck",
+};
+
 export function RewardCharts({ data }: { data: DistributionItem[] }) {
   const chartData = data.map((d) => ({
-    name: rewardLabel(d.reward),
+    name: SHORT_LABEL[d.reward] ?? rewardLabel(d.reward), // x-axis label
+    fullName: rewardLabel(d.reward), // tooltip + pie legend
     reward: d.reward,
     count: d.count,
   }));
@@ -36,9 +43,19 @@ export function RewardCharts({ data }: { data: DistributionItem[] }) {
               margin={{ top: 8, right: 8, left: -16, bottom: 0 }}
             >
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="name" tickLine={false} />
+              <XAxis
+                dataKey="name"
+                tickLine={false}
+                interval={0}
+                tick={{ fontSize: 12 }}
+              />
               <YAxis allowDecimals={false} tickLine={false} axisLine={false} />
-              <Tooltip cursor={{ fill: "rgba(0,0,0,0.04)" }} />
+              <Tooltip
+                cursor={{ fill: "rgba(0,0,0,0.04)" }}
+                labelFormatter={(_, payload) =>
+                  payload?.[0]?.payload?.fullName ?? ""
+                }
+              />
               <Bar dataKey="count" name="Winners" radius={[6, 6, 0, 0]}>
                 {chartData.map((d) => (
                   <Cell key={d.reward} fill={rewardColor(d.reward)} />
@@ -63,7 +80,7 @@ export function RewardCharts({ data }: { data: DistributionItem[] }) {
                 <Pie
                   data={chartData.filter((d) => d.count > 0)}
                   dataKey="count"
-                  nameKey="name"
+                  nameKey="fullName"
                   innerRadius={55}
                   outerRadius={90}
                   paddingAngle={2}

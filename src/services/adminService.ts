@@ -90,3 +90,11 @@ export async function setRedemption(spinId: string, status: RedemptionStatus) {
   });
   if (error) throw error;
 }
+
+export async function deleteCustomers(customerIds: string[]): Promise<number> {
+  const { data, error } = await sb.rpc("admin_delete_customers", {
+    p_customer_ids: customerIds,
+  });
+  if (error) throw error;
+  return Number(data ?? 0);
+}
