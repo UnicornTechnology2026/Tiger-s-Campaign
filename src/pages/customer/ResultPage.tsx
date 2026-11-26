@@ -3,7 +3,7 @@ import { CampaignShell } from "../../components/customer/CampaignShell";
 import { useCampaign } from "../../context/CampaignContext";
 import { celebrate } from "../../lib/confetti";
 import { config } from "../../lib/config";
-import { rewardEmoji, rewardLabel } from "../../lib/wheel";
+import { rewardLabel } from "../../lib/wheel";
 
 export default function ResultPage() {
   const { status } = useCampaign();
@@ -38,9 +38,6 @@ export default function ResultPage() {
 
       <div className="glass-card mt-5 animate-pop text-center">
         <p className="bg-gradient-to-r from-amber-300 via-orange-400 to-brand-400 bg-clip-text font-display text-4xl font-extrabold leading-tight text-transparent">
-          <span className="mr-2 text-5xl" aria-hidden="true">
-            {rewardEmoji(status.reward)}
-          </span>
           {rewardLabel(status.reward)}
         </p>
 

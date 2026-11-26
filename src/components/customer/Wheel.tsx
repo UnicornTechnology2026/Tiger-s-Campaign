@@ -405,16 +405,11 @@ export function Wheel({
           clipPath="url(#sw-hubclip)"
           style={{ pointerEvents: "none" }}
         />
+        {/* soft gloss highlight on the hub */}
         <path
           d="M156 194 A44 44 0 0 1 244 194 C226 175 174 175 156 194 Z"
           fill="#fff"
-          opacity=".36"
-        />
-
-        <path
-          d="M156 194 A44 44 0 0 1 244 194 C226 175 174 175 156 194 Z"
-          fill="#fff"
-          opacity=".36"
+          opacity=".18"
         />
         <g
           fontFamily="Poppins, sans-serif"
