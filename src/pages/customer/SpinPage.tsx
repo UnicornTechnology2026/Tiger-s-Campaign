@@ -6,18 +6,20 @@ import { useCampaign } from "../../context/CampaignContext";
 import { spinWheel } from "../../services/campaignService";
 import { celebrate } from "../../lib/confetti";
 import { toMessage } from "../../lib/errors";
-import type { RewardKey } from "../../lib/wheel";
+import { REWARD_INFO, type RewardKey } from "../../lib/wheel";
+import type { SpinResult } from "../../types";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export default function SpinPage() {
   const navigate = useNavigate();
-  const { status, refresh } = useCampaign();
+  const { status, applySpin } = useCampaign();
 
   const [busy, setBusy] = useState(false);
   const [target, setTarget] = useState<RewardKey | null>(null);
   const [error, setError] = useState<string | null>(null);
   const inFlight = useRef(false);
+  const resultRef = useRef<SpinResult | null>(null);
 
   const onSpinClick = useCallback(async () => {
     if (inFlight.current) return;
@@ -25,24 +27,33 @@ export default function SpinPage() {
     setBusy(true);
     setError(null);
     try {
-      // The server picks the reward and stores it atomically. The wheel then
-      // animates to exactly that reward.
       const result = await spinWheel();
+      if (!result?.reward || !(result.reward in REWARD_INFO)) {
+        throw new Error(
+          "Unexpected reward returned: " + String(result?.reward),
+        );
+      }
+      resultRef.current = result;
       setTarget(result.reward);
     } catch (e) {
+      console.error("spin failed", e);
       setError(toMessage(e));
-      inFlight.current = false; // nothing was recorded, so a retry is safe
+      inFlight.current = false;
     } finally {
       setBusy(false);
     }
   }, []);
 
   const onFinished = useCallback(async () => {
-    if (target !== "better_luck") celebrate();
+    try {
+      if (target !== "better_luck") celebrate();
+    } catch (e) {
+      console.error("confetti failed", e); // never block the redirect
+    }
     await sleep(1600);
-    await refresh();
+    if (resultRef.current) applySpin(resultRef.current);
     navigate("/result", { replace: true });
-  }, [navigate, refresh, target]);
+  }, [navigate, applySpin, target]);
 
   return (
     <CampaignShell>

@@ -9,7 +9,7 @@ import {
 } from "react";
 import { getMyStatus } from "../services/campaignService";
 import { toMessage } from "../lib/errors";
-import type { CustomerStage, MyStatus } from "../types";
+import type { CustomerStage, MyStatus, SpinResult } from "../types";
 
 const INITIAL: MyStatus = {
   status: "unregistered",
@@ -25,6 +25,7 @@ interface CampaignContextValue {
   loading: boolean;
   error: string | null;
   refresh: () => Promise<MyStatus | null>;
+  applySpin: (r: SpinResult) => void;
 }
 
 const Ctx = createContext<CampaignContextValue | null>(null);
@@ -62,13 +63,25 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  /** Marks the customer as "spun" straight from the spin result, so /result opens immediately. */
+  const applySpin = useCallback((r: SpinResult) => {
+    setStatus((prev) => ({
+      ...prev,
+      status: "spun",
+      full_name: prev.full_name ?? r.customer_name,
+      reward: r.reward,
+      claim_id: r.claim_id,
+      spun_at: r.spun_at,
+    }));
+  }, []);
+
   useEffect(() => {
     void refresh();
   }, [refresh]);
 
   const value = useMemo(
-    () => ({ status, loading, error, refresh }),
-    [status, loading, error, refresh],
+    () => ({ status, loading, error, refresh, applySpin }),
+    [status, loading, error, refresh, applySpin],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

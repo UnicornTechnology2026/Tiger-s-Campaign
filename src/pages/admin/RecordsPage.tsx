@@ -10,7 +10,7 @@ import {
 } from "../../services/adminService";
 import { downloadCsv, recordsToCsv } from "../../lib/csv";
 import { toMessage } from "../../lib/errors";
-import { WHEEL_SEGMENTS, rewardLabel } from "../../lib/wheel";
+import { rewardLabel, REWARD_KEYS } from "../../lib/wheel";
 import type { RecordFilters, RecordRow, RedemptionStatus } from "../../types";
 
 const EMPTY_FILTERS: RecordFilters = {
@@ -20,7 +20,7 @@ const EMPTY_FILTERS: RecordFilters = {
   reward: "",
   redemption: "",
 };
-const REWARD_OPTIONS = WHEEL_SEGMENTS.map((s) => s.reward);
+const REWARD_OPTIONS = REWARD_KEYS;
 
 export default function RecordsPage() {
   const [filters, setFilters] = useState<RecordFilters>(EMPTY_FILTERS);
