@@ -84,3 +84,21 @@ body {
     animation: none !important;
   }
 }
+
+/* Hide the text cursor and block text selection everywhere */
+* {
+  -webkit-user-select: none;
+  user-select: none;
+  caret-color: transparent;
+  -webkit-touch-callout: none; /* stops the long-press menu on iOS */
+}
+
+/* But keep typing and selecting working inside form fields */
+input,
+textarea,
+select,
+[contenteditable="true"] {
+  -webkit-user-select: text;
+  user-select: text;
+  caret-color: auto;
+}
