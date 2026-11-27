@@ -167,7 +167,7 @@ export default function RecordsPage() {
       </div>
 
       {/* filters */}
-      <div className="grid gap-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:grid-cols-2 lg:grid-cols-6">
+      <div className="grid gap-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:grid-cols-2 lg:grid-cols-5">
         <div className="relative sm:col-span-2">
           <Search
             size={16}
@@ -212,20 +212,7 @@ export default function RecordsPage() {
             </option>
           ))}
         </select>
-        <select
-          className="admin-input"
-          value={filters.redemption}
-          onChange={(e) =>
-            update({
-              redemption: e.target.value as RecordFilters["redemption"],
-            })
-          }
-          aria-label="Redemption filter"
-        >
-          <option value="">Any status</option>
-          <option value="pending">Pending</option>
-          <option value="redeemed">Redeemed</option>
-        </select>
+
         {hasFilters && (
           <button
             type="button"

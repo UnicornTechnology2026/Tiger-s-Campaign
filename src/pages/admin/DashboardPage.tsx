@@ -116,22 +116,20 @@ export default function DashboardPage() {
               </Link>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[640px] text-left text-sm">
+              <table className="w-full min-w-[480px] text-left text-sm">
                 <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                   <tr>
                     <th className="px-5 py-2.5">Customer</th>
                     <th className="px-5 py-2.5">Mobile</th>
                     <th className="px-5 py-2.5">Reward</th>
-                    <th className="px-5 py-2.5">Claim ID</th>
                     <th className="px-5 py-2.5">Won at</th>
-                    <th className="px-5 py-2.5">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {stats.recent_winners.length === 0 && (
                     <tr>
                       <td
-                        colSpan={6}
+                        colSpan={4}
                         className="px-5 py-10 text-center text-slate-400"
                       >
                         <Clock className="mx-auto mb-2" size={20} /> No winners
@@ -146,24 +144,8 @@ export default function DashboardPage() {
                       <td className="px-5 py-3 font-semibold">
                         {rewardLabel(w.reward)}
                       </td>
-                      <td className="px-5 py-3 font-mono text-xs">
-                        {w.claim_id}
-                      </td>
                       <td className="px-5 py-3 text-slate-500">
                         {new Date(w.spun_at).toLocaleString("en-IN")}
-                      </td>
-                      <td className="px-5 py-3">
-                        <span
-                          className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                            w.redemption_status === "redeemed"
-                              ? "bg-emerald-100 text-emerald-700"
-                              : "bg-amber-100 text-amber-700"
-                          }`}
-                        >
-                          {w.redemption_status === "redeemed"
-                            ? "Redeemed"
-                            : "Pending"}
-                        </span>
                       </td>
                     </tr>
                   ))}

@@ -4,6 +4,7 @@ import { useCampaign } from "../../context/CampaignContext";
 import { celebrate } from "../../lib/confetti";
 import { config } from "../../lib/config";
 import { rewardLabel } from "../../lib/wheel";
+import { formatDateTime } from "../../lib/formatDate";
 
 export default function ResultPage() {
   const { status } = useCampaign();
@@ -16,9 +17,7 @@ export default function ResultPage() {
   }, []);
 
   const noPrize = status.reward === "better_luck";
-  const spunAt = status.spun_at
-    ? new Date(status.spun_at).toLocaleString("en-IN")
-    : "";
+  const spunAt = status.spun_at ? formatDateTime(status.spun_at) : "";
 
   return (
     <CampaignShell>
