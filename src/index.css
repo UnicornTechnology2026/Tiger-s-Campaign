@@ -13,8 +13,33 @@ body,
 }
 
 body {
-  @apply font-sans text-slate-900 antialiased;
+  @apply font-sans text-base leading-normal text-slate-900 antialiased;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Disable text selection everywhere */
+html,
+body,
+body * {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none; /* no long-press menu on iOS */
+}
+
+/* ...but keep typing, selecting and pasting inside form fields */
+input,
+textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* Don't highlight anything if selection still happens somehow */
+::selection {
+  background: transparent;
+}
+input::selection,
+textarea::selection {
+  background: rgba(255, 196, 0, 0.35);
 }
 
 @layer components {
@@ -119,6 +144,15 @@ body {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+  }
+
+  :where(.campaign-bg, .campaign-bg *) {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  :where(.campaign-bg input, .campaign-bg textarea) {
+    -webkit-user-select: text;
+    user-select: text;
   }
 }
 

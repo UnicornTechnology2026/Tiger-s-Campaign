@@ -2,7 +2,6 @@ import { useEffect, useRef } from "react";
 import { CampaignShell } from "../../components/customer/CampaignShell";
 import { useCampaign } from "../../context/CampaignContext";
 import { celebrate } from "../../lib/confetti";
-import { config } from "../../lib/config";
 import { rewardLabel } from "../../lib/wheel";
 import { formatDateTime } from "../../lib/formatDate";
 
@@ -23,7 +22,7 @@ export default function ResultPage() {
     <CampaignShell>
       <div className="text-center">
         <p className="animate-pop text-6xl" aria-hidden="true">
-          {noPrize ? "🍀" : "🎉"}
+          {noPrize ? "😭" : "🎉"}
         </p>
         <h1 className="mt-2 font-display text-3xl font-extrabold">
           {noPrize
@@ -36,7 +35,7 @@ export default function ResultPage() {
       </div>
 
       <div className="glass-card mt-5 animate-pop text-center">
-        <p className="bg-gradient-to-r from-amber-300 via-orange-400 to-brand-400 bg-clip-text font-display text-4xl font-extrabold leading-tight text-transparent">
+        <p className="bg-gradient-to-r from-red-300 via-red-400 to-amber-500 bg-clip-text font-display text-4xl font-extrabold leading-tight text-transparent drop-shadow-[0_2px_6px_rgba(0,0,0,0.45)]">
           {rewardLabel(status.reward)}
         </p>
 
@@ -54,15 +53,6 @@ export default function ResultPage() {
           )}
         </dl>
       </div>
-
-      {noPrize && (
-        <div className="mt-5 rounded-2xl bg-white/10 p-4 text-center">
-          <p className="font-display font-bold">Better luck next time!</p>
-          <p className="mt-1 text-sm text-white/80">
-            Visit {config.outletName} again for more offers.
-          </p>
-        </div>
-      )}
 
       <p className="mt-4 text-center text-xs text-white/60">
         Today's spin has been used. Come back tomorrow for another spin!

@@ -3,7 +3,7 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { LayoutDashboard, LogOut, Menu, Table2, X } from "lucide-react";
 import { useAdminAuth } from "../../context/AdminAuthContext";
 import { config } from "../../lib/config";
-import tigerBarrelLogo from "../../assest/logo text.png";
+import tigerBarrelLogo from "../../assest/logo-text.webp";
 
 const NAV = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
@@ -16,7 +16,7 @@ const NAV = [
 ];
 
 export function AdminLayout() {
-  const { session, signOut } = useAdminAuth();
+  const { signOut } = useAdminAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
@@ -55,7 +55,6 @@ export function AdminLayout() {
         ))}
       </nav>
       <div className="border-t border-white/10 p-4">
-        <p className="truncate text-xs text-white/60">{session?.user.email}</p>
         <button
           type="button"
           onClick={() => void logout()}

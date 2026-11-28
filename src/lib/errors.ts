@@ -18,6 +18,9 @@ const MESSAGES: Record<string, string> = {
   INVALID_STATUS: "Invalid status.",
   NOT_FOUND: "Record not found.",
   NOT_ADMIN: "This account is not an administrator.",
+  INVALID_OTP: "Incorrect OTP. Please check the code and try again.",
+  OTP_INVALID: "Incorrect OTP. Please check the code and try again.",
+  OTP_EXPIRED: "This OTP has expired. Please request a new one.",
 };
 
 export function errorCode(err: unknown): string {

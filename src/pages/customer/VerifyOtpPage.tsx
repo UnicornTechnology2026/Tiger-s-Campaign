@@ -35,13 +35,17 @@ export default function VerifyOtpPage() {
         navigate("/spin", { replace: true });
       } else {
         setOtp("");
+        const left = res.attempts_left;
         setError(
-          res.attempts_left > 0
-            ? `Incorrect OTP. ${res.attempts_left} attempt${res.attempts_left === 1 ? "" : "s"} left.`
-            : "Too many incorrect attempts.",
+          typeof left === "number" && left <= 0
+            ? "Too many incorrect attempts. Please register again."
+            : typeof left === "number"
+              ? `Incorrect OTP. ${left} attempt${left === 1 ? "" : "s"} left.`
+              : "Incorrect OTP. Please try again.",
         );
       }
     } catch (e) {
+      setOtp("");
       setError(toMessage(e));
     } finally {
       inFlight.current = false;
@@ -85,18 +89,21 @@ export default function VerifyOtpPage() {
 
         <OtpInput
           value={otp}
-          onChange={setOtp}
+          onChange={(v) => {
+            setOtp(v);
+            if (error) setError(null);
+          }}
           disabled={submitting}
           hasError={!!error}
         />
 
         {error && (
-          <p
+          <div
             role="alert"
-            className="text-center text-sm font-semibold text-red-300"
+            className="animate-pop rounded-xl bg-red-950/70 px-4 py-3 text-center text-sm font-semibold text-white ring-1 ring-red-300/60"
           >
-            {error}
-          </p>
+            ⚠️ {error}
+          </div>
         )}
 
         <button
@@ -114,13 +121,13 @@ export default function VerifyOtpPage() {
           )}
         </button>
 
-        <div className="flex items-center justify-between text-sm text-white/70">
-          <Link to="/register" className="underline underline-offset-2">
+        <div className="flex items-center justify-between text-sm text-white">
+          <Link to="/register" className="">
             Change number
           </Link>
           <button
             type="button"
-            className="underline underline-offset-2"
+            className=""
             onClick={() => {
               setResent(true);
               setOtp("");
