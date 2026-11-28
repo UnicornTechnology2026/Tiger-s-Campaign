@@ -47,7 +47,7 @@ export default function RegisterPage() {
 
   return (
     <CampaignShell>
-      <form onSubmit={onSubmit} noValidate className="space-y-5">
+      <form onSubmit={onSubmit} noValidate className="space-y-5 glass-card  ">
         <div className="text-center">
           <h1 className="font-display text-2xl font-extrabold">
             Get ready to spin!

@@ -70,7 +70,7 @@ textarea::selection {
   }
 
   .glass-card {
-    @apply rounded-3xl border border-white/20 bg-white/10 p-6 text-white shadow-card backdrop-blur-xl;
+    @apply rounded-3xl border border-white/20 bg-white/10 p-4 text-white shadow-card backdrop-blur-xl;
   }
   /* ---------- Customer-side animations (admin not affected) ---------- */
 

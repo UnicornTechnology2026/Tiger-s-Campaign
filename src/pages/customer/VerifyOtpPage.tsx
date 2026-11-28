@@ -55,7 +55,7 @@ export default function VerifyOtpPage() {
 
   return (
     <CampaignShell>
-      <div className="space-y-5">
+      <div className="space-y-5 glass-card">
         <div className="text-center">
           <h1 className="font-display text-2xl font-extrabold">
             Verify your number
